@@ -74,12 +74,7 @@ Stored in `ground_truth_dag.csv`.
 Test whether mEG-FCI with LLM-provided biophysical knowledge recovers more of the 17-edge
 DAG than FCI alone, given ~740 samples and 3 hidden confounders.
 
-**mEG-FCI override rule** (paper §4.1):
-```
-predicted_edge = expert  if  c_expert > c_FCI + δ
-               = FCI      otherwise
-```
-Expert accuracy swept 0.5 → 1.0. Metrics: skeleton P/R/F1, PAG-SHD, typed precision/recall.
+Metrics: skeleton P/R/F1, PAG-SHD, typed precision/recall.
 
 ## Files
 
