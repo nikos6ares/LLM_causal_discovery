@@ -12,9 +12,24 @@ land-atmosphere fluxes.
 - Hidden (withheld from algorithm): canopy temperature `Tv`, boundary-layer resistance `rb`,
   canopy water `Wc`
 
+**From time series to i.i.d. samples.**
+NOAH-MP outputs a continuous hourly time series. The model equations are ODEs: each variable
+at hour `t+1` is a deterministic function of variables at hour `t` plus stochastic forcing.
+This means each row `(Xₜ, Xₜ₊₁)` encodes one application of the causal mechanism — the
+transition rates H, Et, Eg, LE, etc. are the model's instantaneous outputs at hour `t`.
+Causal discovery algorithms assume i.i.d. rows, so the raw time series cannot be used directly.
+
+Two problems break i.i.d.:
+1. **Seasonal cycles** — Tair, SWdown, LAI follow strong diurnal + annual patterns; consecutive
+   rows share the same point in the seasonal cycle, not just causal structure.
+2. **Residual autocorrelation** — even after removing seasonal cycles, anomalies in slow
+   variables (SWC, LAI) stay correlated for days to weeks.
+
 **Preprocessing:**
 1. Deseasonalize: subtract (hour × month) climatology to remove diurnal + annual cycles
-2. Subsample every 240 h (ACF envelope method; SWC anomalies remain slow — known limitation)
+2. Subsample every 240 h: pick rows far enough apart that ACF drops below 0.1 (checked via
+   envelope of |ACF| local maxima to avoid false zero-crossings from oscillatory signals).
+   SWC anomalies remain slow beyond 240 h — residual correlation is a known limitation.
 
 ## Ground truth DAG — 22 edges
 
