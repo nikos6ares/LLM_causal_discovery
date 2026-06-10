@@ -1,0 +1,4 @@
+NOAH_MP/sites.tar.gz filter=lfs diff=lfs merge=lfs -text
+NOAH_MP/technotes_599.pdf filter=lfs diff=lfs merge=lfs -text
+NOAH_MP/sites.tar.gz !text !filter !merge !diff
+NOAH_MP/technotes_599.pdf !text !filter !merge !diff
