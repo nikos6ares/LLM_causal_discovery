@@ -6,8 +6,13 @@ experimentally validated via drug perturbations. This is an experiment with **re
 
 - **853 rows × 11 proteins** — human T-cells measured by flow cytometry (fluorescence intensity)
 - Each row = one cell, one snapshot (no time series)
-- Source: bnlearn dataset (`sachs.data.txt.gz`), observational condition only
 - Log-transform before running CI tests (values are positive, right-skewed)
+
+Downloaded from bnlearn:
+```
+https://www.bnlearn.com/book-crc/code/sachs.data.txt.gz
+```
+Observational condition only (no drug interventions). Loaded with `pd.read_csv(..., sep='\t')`.
 
 ## Variables
 
@@ -41,15 +46,6 @@ Stored in `ground_truth_dag.csv`.
 
 Test whether mEG-FCI with LLM-provided biochemistry knowledge recovers more of the 17-edge
 network than FCI alone on 853 observational samples.
-
-Standard FCI on observational-only data misses edges due to hidden confounders and finite-sample
-power — the LLM provides prior knowledge about signalling cascades (e.g. "PKA inhibits Raf")
-as a calibrated distribution over PAG edge types. The mEG-FCI override rule (paper §4.1):
-
-```
-predicted_edge = expert  if  c_expert > c_FCI + δ
-               = FCI      otherwise
-```
 
 Metrics: skeleton P/R/F1, PAG-SHD, typed precision/recall vs 17-edge ground truth (paper §C.1).
 
