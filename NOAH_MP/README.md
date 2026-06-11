@@ -5,6 +5,43 @@ simultaneous snapshot of all 12 variables at a single hourly timestep. The groun
 DAG captures which variables structurally determine which others **within the same timestep**,
 as given by the NOAH-MP process equations.
 
+## What is a land-surface model?
+
+A land-surface model (LSM) is a physical simulator of how the land surface exchanges
+energy and water with the atmosphere. Think of it as a differential-equation engine:
+given weather inputs (sunlight, temperature, wind, rain), it computes how much heat,
+water vapour, and carbon the land surface releases back to the air each hour.
+
+NOAH-MP specifically models a single patch of land (one grid cell). At each hourly step it:
+1. Takes atmospheric forcing (ERA5 reanalysis data) as boundary conditions
+2. Solves coupled ODEs for energy balance, stomatal conductance, soil hydrology
+3. Outputs instantaneous flux rates (how fast energy/water is being exchanged right now)
+
+It is widely used in numerical weather prediction (e.g. inside NOAA's operational forecasts).
+The causal graph is **known exactly** because the equations are explicit — unlike real field
+measurements where the true graph is unknown.
+
+## Variables
+
+| Variable | Units | Type | Physical meaning |
+|----------|-------|------|-----------------|
+| `Tair` | K | Forcing | Near-surface air temperature |
+| `Ur` | m/s | Forcing | Wind speed |
+| `SWdown` | W/m² | Forcing | Incoming solar (shortwave) radiation — sunlight |
+| `LWdown` | W/m² | Forcing | Incoming thermal (longwave) radiation — heat from atmosphere |
+| `Precip` | mm/s | Forcing | Precipitation rate |
+| `SWC` | m³/m³ | State | Soil water content — how wet the soil is |
+| `LAI` | m²/m² | State | Leaf area index — how much leaf area per ground area (proxy for vegetation density) |
+| `Rn` | W/m² | Flux | Net radiation — total energy absorbed by the surface |
+| `H` | W/m² | Flux | Sensible heat flux — energy transferred to air as heat (warms the atmosphere) |
+| `Et` | W/m² | Flux | Transpiration — water vapour released through plant stomata |
+| `Eg` | W/m² | Flux | Ground evaporation — water vapour evaporated directly from soil surface |
+| `LE` | W/m² | Flux | Latent heat flux — total energy used for evapotranspiration (= λ·(Et + Eg)) |
+
+Forcing variables are prescribed externally (ERA5). State variables carry over from the
+previous timestep. Flux variables are computed fresh at each timestep from forcing + state —
+these are the causally downstream outputs.
+
 ## Data
 
 - 10 sites × 2 years of hourly NOAH-MP output → subsampled to **740 rows × 12 variables**
@@ -88,7 +125,3 @@ Metrics: skeleton P/R/F1, PAG-SHD, typed precision/recall.
 | `sites.tar.gz` | Raw per-site HRLDAS output (compressed) |
 | `technotes_599.pdf` | NCAR/TN-599+STR: NOAH-MP v5.0 technical description |
 
-## References
-
-Yang Z-L et al. (2023). NCAR/TN-599+STR.
-Spirtes et al. (2000). *Causation, Prediction, and Search*. MIT Press.
